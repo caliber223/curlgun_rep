@@ -6,8 +6,6 @@
 #include "curlset.h"
 #include "QColor"
 
-//using namespace std;
-
 TestCurls curls;
 static char errorBuffer[CURL_ERROR_SIZE];
 static std::string buffer;
