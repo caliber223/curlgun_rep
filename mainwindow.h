@@ -26,6 +26,8 @@ private slots:
 private:
     QLabel        *plb1;
     QLabel        *plb2;
+    QLabel        *plb3;  // passed
+    QLabel        *plb4;  // failed
     QLineEdit     *ple1;
     QLineEdit     *ple2;
     QPushButton   *ppb1;
@@ -33,7 +35,9 @@ private:
     QPushButton   *ppb3;
     QPushButton   *ppb4;
     QTableWidget  *table1;
-    QLCDNumber    *lcdnumber1;
+    QLCDNumber    *lcdnumber1;  // failed
+    QLCDNumber    *lcdnumber2;  // passed
+
 };
 
 #endif // MAINWINDOW_H

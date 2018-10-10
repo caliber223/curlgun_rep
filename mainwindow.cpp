@@ -57,18 +57,24 @@ MainWindow::MainWindow(QWidget *parent)
     setMinimumSize(1000, 740);
     setStyleSheet("background-color: rgb(100, 130, 140)");
 
-    plb1 = new QLabel(tr("Sourse:"), this);
+    plb1 = new QLabel(tr("Sourse file:"), this);
     plb1->setGeometry(40, 20, 80, 24);
 
-    plb2 = new QLabel(tr("Add curl:"), this);
-    plb2->setGeometry(40, 510, 80, 24);
+    plb2 = new QLabel(tr("Add URL:"), this);
+    plb2->setGeometry(40, 370, 80, 24);
+
+    plb3 = new QLabel(tr("Passed:"), this);
+    plb3->setGeometry(40, 410, 80, 24);
+
+    plb4 = new QLabel(tr("Failed:"), this);
+    plb4->setGeometry(350, 410, 40, 24);
 
     ple1 = new QLineEdit(this);
     ple1->setGeometry(120, 20, 600, 24);
     ple1->setStyleSheet("background-color: white");
 
     ple2 = new QLineEdit(this);
-    ple2->setGeometry(120, 510, 600, 24);
+    ple2->setGeometry(120, 370, 600, 24);
     ple2->setStyleSheet("background-color: white");
 
     ppb1 = new QPushButton(tr("Load"), this);
@@ -87,20 +93,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ppb3, SIGNAL(clicked(bool)), this, SLOT(downButtonStart()));
 
     ppb4 = new QPushButton(tr("Add"), this);
-    ppb4->setGeometry(730, 510, 40, 24);
+    ppb4->setGeometry(730, 370, 40, 24);
     ppb4->setStyleSheet("background-color: lightGray");
     connect(ppb4, SIGNAL(clicked(bool)), this, SLOT(downButtonAdd()));
 
     table1 = new QTableWidget(this);
-    table1->setGeometry(120, 60, 860, 440);
+    table1->setGeometry(120, 60, 860, 300);
     table1->setStyleSheet("background-color: lightGray");
     table1->setShowGrid(true);
     table1->setRowCount(1);
     table1->setColumnCount(2);
 
     lcdnumber1 = new QLCDNumber(this);
-    lcdnumber1->setGeometry(20, 550, 180, 32);
+    lcdnumber1->setGeometry(120, 410, 180, 32);
     lcdnumber1->setStyleSheet("background-color: lightGray");
+
+    lcdnumber2 = new QLCDNumber(this);
+    lcdnumber2->setGeometry(420, 410, 180, 32);
+    lcdnumber2->setStyleSheet("background-color: lightGray");
 
 }
 
