@@ -19,7 +19,8 @@ static int writer(char *data, size_t size, size_t nmemb, std::string *buffer){
     return result;
 }
 
-static void curlstart(std::string &inUrl, std::string &inProxy, int inHeader) {
+bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj) {
+    bool state = true;
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl;
     CURLcode result;
@@ -28,24 +29,29 @@ static void curlstart(std::string &inUrl, std::string &inProxy, int inHeader) {
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_URL, inUrl.c_str());
    //     curl_easy_setopt(curl, CURLOPT_PROXY, inProxy.c_str());
+        inProxy = "";  // for kill warning
         curl_easy_setopt(curl, CURLOPT_HEADER, inHeader);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         result = curl_easy_perform(curl);
         if(result == CURLE_OK) {
+            state = true;
             std::ofstream fout(curls.GetResponseFile().c_str(), std::ios_base::app);
             fout <<buffer <<std::endl;
             fout.close();
-        //    printf("\n--------------------- %s\n", buffer.c_str());
+            obj->setResponseText(buffer);
         } else {
+            state = false;
             std::ofstream fout(curls.GetErrorFile().c_str(), std::ios_base::app);
             fout <<errorBuffer <<std::endl;
             fout.close();
-        //    printf("\n ERROR: %s", errorBuffer);
+            std::string eb = errorBuffer;
+            obj->setResponseText(eb);
         }
     }
     curl_easy_cleanup(curl);
     curl_global_cleanup();
+    return state;
 }
 
 
@@ -55,10 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(tr("curlgun v.0.1"));
     setMinimumSize(1000, 740);
-    setStyleSheet("background-color: rgb(100, 130, 140)");
+    setStyleSheet("background-color: rgb(93, 93, 111)");
 
     plb1 = new QLabel(tr("Sourse file:"), this);
     plb1->setGeometry(40, 20, 80, 24);
+    plb1->setStyleSheet("color: lightGrey");
 
     plb2 = new QLabel(tr("Add URL:"), this);
     plb2->setGeometry(40, 370, 80, 24);
@@ -112,6 +119,10 @@ MainWindow::MainWindow(QWidget *parent)
     lcdnumber2->setGeometry(420, 410, 180, 32);
     lcdnumber2->setStyleSheet("background-color: lightGray");
 
+    responseWindow = new QTextEdit(this);
+    responseWindow->setGeometry(120, 460, 860, 250);
+    responseWindow->setStyleSheet("background-color: lightGray");
+
 }
 
 void MainWindow::downButtonLoad() {
@@ -126,7 +137,7 @@ void MainWindow::downButtonLoad() {
         curls.AddCurl(newcurl);
     }
     fin.close();
-    lcdnumber1->display(int(curls.GetSize()));
+ //   lcdnumber1->display(int(curls.GetSize()));
     table1->setRowCount(int(curls.GetSize()));
 
     for (size_t i = 0; i < curls.GetSize(); ++i) {
@@ -143,12 +154,19 @@ void MainWindow::downButtonClear() {
 }
 
 bool MainWindow::downButtonStart() {
+    bool state = true;
     std::string outUrl;
     std::string outProxy = "";
     int outHeader = 1;
     for(size_t i = 0; i < curls.GetSize(); ++i) {
         outUrl = curls.GetCurls()[i];
-        curlstart(outUrl, outProxy, outHeader);
+        responseWindow->clear();
+        state = curlstart(outUrl, outProxy, outHeader, this);
+        if(state) {
+            lcdnumber1->display(lcdnumber1->intValue() + 1);
+        } else {
+            lcdnumber2->display(lcdnumber2->intValue() + 1);
+        }
     }
     return true;
 }
@@ -164,6 +182,14 @@ bool MainWindow::downButtonAdd() {
     QTableWidgetItem *item = new QTableWidgetItem(ple2->text());
     table1->setItem(table1->rowCount() - 1, 1, item);
 
+    return true;
+}
+
+bool MainWindow::setResponseText(std::string &newtext) {
+    if(newtext.empty()) {
+        return false;
+    }
+    MainWindow::responseWindow->setText(QString::fromStdString(newtext));
     return true;
 }
 

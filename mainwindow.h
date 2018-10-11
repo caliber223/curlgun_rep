@@ -16,6 +16,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    bool setResponseText(std::string &newtext);
 
 private slots:
     void downButtonLoad();
@@ -28,6 +29,7 @@ private:
     QLabel        *plb2;
     QLabel        *plb3;  // passed
     QLabel        *plb4;  // failed
+    QTextEdit *responseWindow;
     QLineEdit     *ple1;
     QLineEdit     *ple2;
     QPushButton   *ppb1;
@@ -39,5 +41,7 @@ private:
     QLCDNumber    *lcdnumber2;  // passed
 
 };
+
+bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj);
 
 #endif // MAINWINDOW_H
