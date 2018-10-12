@@ -40,6 +40,7 @@ bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindo
             fout <<buffer <<std::endl;
             fout.close();
             obj->setResponseText(buffer);
+            buffer.clear();
         } else {
             state = false;
             std::ofstream fout(curls.GetErrorFile().c_str(), std::ios_base::app);
@@ -47,11 +48,21 @@ bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindo
             fout.close();
             std::string eb = errorBuffer;
             obj->setResponseText(eb);
+        //    errorBuffer = "";
         }
     }
     curl_easy_cleanup(curl);
     curl_global_cleanup();
     return state;
+}
+
+bool checkSelect(std::string &inStr, std::string &selected) {
+    if(inStr.empty()) {
+        return false;
+    }
+    std::vector <std::string> items;
+
+    return true;
 }
 
 
@@ -61,20 +72,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(tr("curlgun v.0.1"));
     setMinimumSize(1000, 740);
-    setStyleSheet("background-color: rgb(93, 93, 111)");
+    setStyleSheet("background-color: rgb(50, 50, 50)");
 
     plb1 = new QLabel(tr("Sourse file:"), this);
     plb1->setGeometry(40, 20, 80, 24);
-    plb1->setStyleSheet("color: lightGrey");
+    plb1->setStyleSheet("color: lightBlue");
 
     plb2 = new QLabel(tr("Add URL:"), this);
     plb2->setGeometry(40, 370, 80, 24);
+    plb2->setStyleSheet("color: lightBlue");
 
     plb3 = new QLabel(tr("Passed:"), this);
     plb3->setGeometry(40, 410, 80, 24);
+    plb3->setStyleSheet("color: lightBlue");
 
     plb4 = new QLabel(tr("Failed:"), this);
     plb4->setGeometry(350, 410, 40, 24);
+    plb4->setStyleSheet("color: lightBlue");
 
     ple1 = new QLineEdit(this);
     ple1->setGeometry(120, 20, 600, 24);
