@@ -42,7 +42,7 @@ private:
 
 };
 
-bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj);
-bool checkSelect(std::string &inStr, std::string &selected);
+bool curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj);
+bool checkSelect(const std::string &inStr, const std::string &selected);
 
 #endif // MAINWINDOW_H

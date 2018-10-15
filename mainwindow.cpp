@@ -19,7 +19,7 @@ static int writer(char *data, size_t size, size_t nmemb, std::string *buffer){
     return result;
 }
 
-bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj) {
+bool curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj) {
     bool state = true;
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl;
@@ -56,13 +56,34 @@ bool curlstart(std::string &inUrl, std::string &inProxy, int inHeader, MainWindo
     return state;
 }
 
-bool checkSelect(std::string &inStr, std::string &selected) {
-    if(inStr.empty()) {
+bool checkSelect(const std::string &inStr, const std::string &selected) {
+    if(inStr.empty() || selected.empty()) {
         return false;
     }
+    // in "selected"  " " (space) - is separator
     std::vector <std::string> items;
+    std::string str_tail = selected;
+    const char separator = ' ';
+    while(!str_tail.empty()) {
+        size_t pos = 0;
+        if((pos = str_tail.find(separator)) != std::string::npos) {
+            items.push_back(str_tail.substr(0, pos));
+            str_tail = str_tail.substr(pos + 1, std::string::npos);
+            while(0 == str_tail.find(separator)) {
+                str_tail = str_tail.substr(1, std::string::npos);
+            }
+        } else {
+            items.push_back(str_tail);
+            str_tail = "";
+        }
+    }
+    for(size_t i = 0; i < items.size(); ++i) {
+        if(inStr.find(items[i]) != std::string::npos) {
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 
