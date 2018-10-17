@@ -19,8 +19,8 @@ static int writer(char *data, size_t size, size_t nmemb, std::string *buffer){
     return result;
 }
 
-bool curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj) {
-    bool state = true;
+int curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, const std::string inKeys, MainWindow *obj) {
+    int state = 0;
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl;
     CURLcode result;
@@ -35,18 +35,30 @@ bool curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, Mai
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         result = curl_easy_perform(curl);
         if(result == CURLE_OK) {
-            state = true;
+            state = 1;
             std::ofstream fout(curls.GetResponseFile().c_str(), std::ios_base::app);
             fout <<buffer <<std::endl;
             fout.close();
+            if(!inKeys.empty() && checkSelect(buffer, inKeys)) {
+                state = 2;
+                std::ofstream fselect(curls.GetSelectedFile().c_str(), std::ios_base::app);
+                fselect <<std::endl <<buffer <<std::endl;
+                fselect.close();
+            }
             obj->setResponseText(buffer);
             buffer.clear();
         } else {
-            state = false;
+            state = 3;
             std::ofstream fout(curls.GetErrorFile().c_str(), std::ios_base::app);
             fout <<errorBuffer <<std::endl;
             fout.close();
             std::string eb = errorBuffer;
+            if(!inKeys.empty() && checkSelect(eb, inKeys)) {
+                state = 4;
+                std::ofstream fselect(curls.GetSelectedFile().c_str(), std::ios_base::app);
+                fselect <<std::endl <<eb <<std::endl;
+                fselect.close();
+            }
             obj->setResponseText(eb);
         //    errorBuffer = "";
         }
@@ -100,62 +112,78 @@ MainWindow::MainWindow(QWidget *parent)
     plb1->setStyleSheet("color: lightBlue");
 
     plb2 = new QLabel(tr("Add URL:"), this);
-    plb2->setGeometry(40, 370, 80, 24);
+    plb2->setGeometry(40, 55, 80, 24);
     plb2->setStyleSheet("color: lightBlue");
 
     plb3 = new QLabel(tr("Passed:"), this);
-    plb3->setGeometry(40, 410, 80, 24);
+    plb3->setGeometry(40, 125, 80, 24);
     plb3->setStyleSheet("color: lightBlue");
 
     plb4 = new QLabel(tr("Failed:"), this);
-    plb4->setGeometry(350, 410, 40, 24);
+    plb4->setGeometry(350, 125, 40, 24);
     plb4->setStyleSheet("color: lightBlue");
+
+    plb5 = new QLabel(tr("Selected:"), this);
+    plb5->setGeometry(660, 125, 60, 24);
+    plb5->setStyleSheet("color: lightBlue");
+
+    plb6 = new QLabel(tr("Keywords:"), this);
+    plb6->setGeometry(40, 90, 80, 24);
+    plb6->setStyleSheet("color: lightBlue");
 
     ple1 = new QLineEdit(this);
     ple1->setGeometry(120, 20, 600, 24);
     ple1->setStyleSheet("background-color: white");
 
     ple2 = new QLineEdit(this);
-    ple2->setGeometry(120, 370, 600, 24);
+    ple2->setGeometry(120, 55, 600, 24);
     ple2->setStyleSheet("background-color: white");
 
+    keys = new QLineEdit(this);
+    keys->setGeometry(120, 90, 600, 24);
+    keys->setStyleSheet("background-color: white");
+
     ppb1 = new QPushButton(tr("Load"), this);
-    ppb1->setGeometry(20, 50, 80, 24);
+    ppb1->setGeometry(20, 200, 80, 24);
     ppb1->setStyleSheet("background-color: lightGray");
     connect(ppb1, SIGNAL(clicked(bool)), this, SLOT(downButtonLoad()));
 
     ppb2 = new QPushButton(tr("Clear"), this);
-    ppb2->setGeometry(20, 90, 80, 24);
+    ppb2->setGeometry(20, 240, 80, 24);
     ppb2->setStyleSheet("background-color: lightGray");
     connect(ppb2, SIGNAL(clicked(bool)), this, SLOT(downButtonClear()));
 
     ppb3 = new QPushButton(tr("Start"), this);
-    ppb3->setGeometry(20, 144, 80, 24);
+    ppb3->setGeometry(20, 300, 80, 24);
     ppb3->setStyleSheet("background-color: lightGray");
     connect(ppb3, SIGNAL(clicked(bool)), this, SLOT(downButtonStart()));
 
     ppb4 = new QPushButton(tr("Add"), this);
-    ppb4->setGeometry(730, 370, 40, 24);
+    ppb4->setGeometry(730, 55, 40, 24);
     ppb4->setStyleSheet("background-color: lightGray");
     connect(ppb4, SIGNAL(clicked(bool)), this, SLOT(downButtonAdd()));
 
     table1 = new QTableWidget(this);
-    table1->setGeometry(120, 60, 860, 300);
+    table1->setGeometry(120, 170, 860, 300);
     table1->setStyleSheet("background-color: lightGray");
     table1->setShowGrid(true);
     table1->setRowCount(1);
     table1->setColumnCount(2);
 
     lcdnumber1 = new QLCDNumber(this);
-    lcdnumber1->setGeometry(120, 410, 180, 32);
+    lcdnumber1->setGeometry(120, 125, 180, 32);
     lcdnumber1->setStyleSheet("background-color: lightGray");
 
     lcdnumber2 = new QLCDNumber(this);
-    lcdnumber2->setGeometry(420, 410, 180, 32);
+    lcdnumber2->setGeometry(420, 125, 180, 32);
     lcdnumber2->setStyleSheet("background-color: lightGray");
 
+    lcdnumber3 = new QLCDNumber(this);
+    lcdnumber3->setGeometry(740, 125, 180, 32);
+    lcdnumber3->setStyleSheet("background-color: lightGray");
+
     responseWindow = new QTextEdit(this);
-    responseWindow->setGeometry(120, 460, 860, 250);
+    responseWindow->setGeometry(120, 480, 860, 250);
     responseWindow->setStyleSheet("background-color: lightGray");
 
 }
@@ -189,18 +217,31 @@ void MainWindow::downButtonClear() {
 }
 
 bool MainWindow::downButtonStart() {
-    bool state = true;
+    int state = 0;
     std::string outUrl;
     std::string outProxy = "";
     int outHeader = 1;
     for(size_t i = 0; i < curls.GetSize(); ++i) {
         outUrl = curls.GetCurls()[i];
         responseWindow->clear();
-        state = curlstart(outUrl, outProxy, outHeader, this);
-        if(state) {
+        state = curlstart(outUrl, outProxy, outHeader, keys->text().toStdString(), this);
+        switch (state) {
+        case 1:
             lcdnumber1->display(lcdnumber1->intValue() + 1);
-        } else {
+            break;
+        case 2:
+            lcdnumber1->display(lcdnumber1->intValue() + 1);
+            lcdnumber3->display(lcdnumber3->intValue() + 1);
+            break;
+        case 3:
             lcdnumber2->display(lcdnumber2->intValue() + 1);
+            break;
+        case 4:
+            lcdnumber2->display(lcdnumber2->intValue() + 1);
+            lcdnumber3->display(lcdnumber3->intValue() + 1);
+            break;
+        default:
+            break;
         }
     }
     return true;

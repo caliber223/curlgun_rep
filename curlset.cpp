@@ -5,6 +5,7 @@ TestCurls::TestCurls() {
     mResponseFile = "response.log";
     mErrorFile = "error.log";
     mSourseFile = "curls.dat";
+    mSelectedFile = "selected.log";
 }
 
 TestCurls::~TestCurls() {
@@ -61,3 +62,16 @@ bool TestCurls::SetErrorFile(std::string &ef) {
     mErrorFile = ef;
     return true;
 }
+
+std::string TestCurls::GetSelectedFile() {
+    return mSelectedFile;
+}
+
+bool TestCurls::SetSelectedFile(std::string &selecf) {
+    if(selecf.empty()) {
+        return false;
+    }
+    mSelectedFile = selecf;
+    return true;
+}
+

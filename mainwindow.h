@@ -29,9 +29,12 @@ private:
     QLabel        *plb2;
     QLabel        *plb3;  // passed
     QLabel        *plb4;  // failed
-    QTextEdit *responseWindow;
+    QLabel        *plb5;  // selected
+    QLabel        *plb6;  // keywords
+    QTextEdit     *responseWindow;
     QLineEdit     *ple1;
     QLineEdit     *ple2;
+    QLineEdit     *keys;  // keywords
     QPushButton   *ppb1;
     QPushButton   *ppb2;
     QPushButton   *ppb3;
@@ -39,10 +42,11 @@ private:
     QTableWidget  *table1;
     QLCDNumber    *lcdnumber1;  // failed
     QLCDNumber    *lcdnumber2;  // passed
+    QLCDNumber    *lcdnumber3;  // selected
 
 };
 
-bool curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, MainWindow *obj);
+int curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, const std::string inKeys, MainWindow *obj);
 bool checkSelect(const std::string &inStr, const std::string &selected);
 
 #endif // MAINWINDOW_H
