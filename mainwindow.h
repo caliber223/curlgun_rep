@@ -8,6 +8,7 @@
 #include <QTextEdit>
 #include <QLCDNumber>
 #include <QTableWidget>
+#include <QCheckBox>
 
 class MainWindow : public QMainWindow
 {
@@ -23,6 +24,7 @@ private slots:
     void downButtonClear();
     bool downButtonStart();
     bool downButtonAdd();
+    bool downAllClearButton();
 
 private:
     QLabel        *plb1;
@@ -39,10 +41,12 @@ private:
     QPushButton   *ppb2;
     QPushButton   *ppb3;
     QPushButton   *ppb4;
+    QPushButton   *clearAllButton;
     QTableWidget  *table1;
     QLCDNumber    *lcdnumber1;  // failed
     QLCDNumber    *lcdnumber2;  // passed
     QLCDNumber    *lcdnumber3;  // selected
+    QCheckBox     *alltogether;
 
 };
 

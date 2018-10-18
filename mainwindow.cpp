@@ -144,24 +144,29 @@ MainWindow::MainWindow(QWidget *parent)
     keys->setStyleSheet("background-color: white");
 
     ppb1 = new QPushButton(tr("Load"), this);
-    ppb1->setGeometry(20, 200, 80, 24);
+    ppb1->setGeometry(15, 200, 90, 24);
     ppb1->setStyleSheet("background-color: lightGray");
     connect(ppb1, SIGNAL(clicked(bool)), this, SLOT(downButtonLoad()));
 
-    ppb2 = new QPushButton(tr("Clear"), this);
-    ppb2->setGeometry(20, 240, 80, 24);
+    ppb2 = new QPushButton(tr("Clear URLs"), this);
+    ppb2->setGeometry(15, 240, 90, 24);
     ppb2->setStyleSheet("background-color: lightGray");
     connect(ppb2, SIGNAL(clicked(bool)), this, SLOT(downButtonClear()));
 
     ppb3 = new QPushButton(tr("Start"), this);
-    ppb3->setGeometry(20, 300, 80, 24);
+    ppb3->setGeometry(15, 340, 90, 24);
     ppb3->setStyleSheet("background-color: lightGray");
     connect(ppb3, SIGNAL(clicked(bool)), this, SLOT(downButtonStart()));
 
     ppb4 = new QPushButton(tr("Add"), this);
-    ppb4->setGeometry(730, 55, 40, 24);
+    ppb4->setGeometry(740, 55, 40, 24);
     ppb4->setStyleSheet("background-color: lightGray");
     connect(ppb4, SIGNAL(clicked(bool)), this, SLOT(downButtonAdd()));
+
+    clearAllButton = new QPushButton(tr("Clear results"), this);
+    clearAllButton->setGeometry(15, 280, 90, 24);
+    clearAllButton->setStyleSheet("background-color: lightGray");
+    connect(clearAllButton, SIGNAL(clicked(bool)), this, SLOT(downAllClearButton()));
 
     table1 = new QTableWidget(this);
     table1->setGeometry(120, 170, 860, 300);
@@ -185,6 +190,10 @@ MainWindow::MainWindow(QWidget *parent)
     responseWindow = new QTextEdit(this);
     responseWindow->setGeometry(120, 480, 860, 250);
     responseWindow->setStyleSheet("background-color: lightGray");
+
+    alltogether = new QCheckBox(tr("All together"), this);
+    alltogether->setGeometry(740, 90, 120, 24);
+    alltogether->setStyleSheet("background-color: white");
 
 }
 
@@ -214,6 +223,16 @@ void MainWindow::downButtonClear() {
     curls.Clear();
     table1->clearContents();
     table1->setRowCount(1);
+}
+
+bool MainWindow::downAllClearButton() {
+    std::ofstream fout(curls.GetResponseFile().c_str(), std::ios_base::trunc);
+    fout.close();
+    fout.open(curls.GetErrorFile().c_str(), std::ios_base::trunc);
+    fout.close();
+    fout.open(curls.GetSelectedFile().c_str(), std::ios_base::trunc);
+    fout.close();
+    return true;
 }
 
 bool MainWindow::downButtonStart() {
