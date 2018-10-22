@@ -28,8 +28,8 @@ int curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, cons
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_URL, inUrl.c_str());
-   //     curl_easy_setopt(curl, CURLOPT_PROXY, inProxy.c_str());
-        inProxy = "";  // for kill warning
+        inProxy = "80";  // for kill warning
+  //      curl_easy_setopt(curl, CURLOPT_PROXY, inProxy.c_str());
         curl_easy_setopt(curl, CURLOPT_HEADER, inHeader);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
@@ -37,11 +37,15 @@ int curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, cons
         if(result == CURLE_OK) {
             state = 1;
             std::ofstream fout(curls.GetResponseFile().c_str(), std::ios_base::app);
+            fout <<std::endl <<"------------------------------ URL: " <<std::endl;
+            fout <<inUrl <<std::endl;
             fout <<buffer <<std::endl;
             fout.close();
             if(!inKeys.empty() && checkSelect(buffer, inKeys)) {
                 state = 2;
                 std::ofstream fselect(curls.GetSelectedFile().c_str(), std::ios_base::app);
+                fselect <<std::endl <<"------------------------------ URL: " <<std::endl;
+                fselect <<inUrl <<std::endl;
                 fselect <<std::endl <<buffer <<std::endl;
                 fselect.close();
             }
@@ -50,12 +54,16 @@ int curlstart(const std::string &inUrl, std::string &inProxy, int inHeader, cons
         } else {
             state = 3;
             std::ofstream fout(curls.GetErrorFile().c_str(), std::ios_base::app);
+            fout <<std::endl <<"------------------------------ URL: " <<std::endl;
+            fout <<inUrl <<std::endl;
             fout <<errorBuffer <<std::endl;
             fout.close();
             std::string eb = errorBuffer;
             if(!inKeys.empty() && checkSelect(eb, inKeys)) {
                 state = 4;
                 std::ofstream fselect(curls.GetSelectedFile().c_str(), std::ios_base::app);
+                fselect <<std::endl <<"------------------------------ URL: " <<std::endl;
+                fselect <<inUrl <<std::endl;
                 fselect <<std::endl <<eb <<std::endl;
                 fselect.close();
             }
@@ -170,6 +178,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     table1 = new QTableWidget(this);
     table1->setGeometry(120, 170, 860, 300);
+    table1->horizontalHeader()->setStretchLastSection(true);
     table1->setStyleSheet("background-color: lightGray");
     table1->setShowGrid(true);
     table1->setRowCount(1);
@@ -232,6 +241,9 @@ bool MainWindow::downAllClearButton() {
     fout.close();
     fout.open(curls.GetSelectedFile().c_str(), std::ios_base::trunc);
     fout.close();
+    lcdnumber1->display(0);
+    lcdnumber2->display(0);
+    lcdnumber3->display(0);
     return true;
 }
 

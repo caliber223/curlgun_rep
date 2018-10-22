@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtGui>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -9,6 +10,7 @@
 #include <QLCDNumber>
 #include <QTableWidget>
 #include <QCheckBox>
+#include <QHeaderView>
 
 class MainWindow : public QMainWindow
 {
@@ -47,6 +49,7 @@ private:
     QLCDNumber    *lcdnumber2;  // passed
     QLCDNumber    *lcdnumber3;  // selected
     QCheckBox     *alltogether;
+    QMenuBar      *menubar;
 
 };
 
